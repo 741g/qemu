@@ -864,6 +864,12 @@ int hvf_vcpu_exec(CPUState *cpu)
             env->has_error_code = true;
             env->error_code = 0;
             break;
+        case EXIT_REASON_DR_ACCESS:
+            load_regs(cpu);
+            // TODO: This is a workaround; do something more meaningful with DR instead of skipping it
+            env->eip += rvmcs(cpu->hvf_fd, VMCS_EXIT_INSTRUCTION_LENGTH);
+            store_regs(cpu);
+            break;
         default:
             error_report("%llx: unhandled exit %llx", rip, exit_reason);
         }
